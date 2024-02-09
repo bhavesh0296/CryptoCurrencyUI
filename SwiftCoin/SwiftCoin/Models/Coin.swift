@@ -8,8 +8,9 @@
 import Foundation
 
 // MARK: - Welcome
-struct Coin: Codable {
-    let id, symbol, name: String?
+struct Coin: Codable, Identifiable {
+    let id: String
+    let symbol, name: String?
     let image: String?
     let currentPrice, marketCap, marketCapRank, fullyDilutedValuation: Double?
     let totalVolume, high24H, low24H: Double?
@@ -52,7 +53,7 @@ struct Coin: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decodeIfPresent(String.self, forKey: .id)
+        self.id = try container.decode(String.self, forKey: .id)
         self.symbol = try container.decodeIfPresent(String.self, forKey: .symbol)
         self.name = try container.decodeIfPresent(String.self, forKey: .name)
         self.image = try container.decodeIfPresent(String.self, forKey: .image)

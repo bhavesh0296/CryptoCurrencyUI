@@ -9,10 +9,18 @@ import Foundation
 
 class HomeViewModel: ObservableObject {
 
-    init() {
-        fetchCoinData()
+    @Published var coins: [Coin] = []
+    @Published var topMoversCoins: [Coin] = []
 
-//        let data = []
+    init() {
+//        fetchCoinData()
+
+        let data: [Coin] = Array<Coin>.loadJSONData(from: "data")
+        DispatchQueue.main.async {
+            self.coins = data
+            self.configureTopMovingCoins()
+        }
+        print("DEBUG Data is fetch \(data)")
     }
 
     func fetchCoinData() {
@@ -36,10 +44,17 @@ class HomeViewModel: ObservableObject {
             print("DEBUG: Data \(data)")
 
             do {
-                let coin = try JSONDecoder().decode([Coin].self, from: data)
-                print(')
+                let coins = try JSONDecoder().decode([Coin].self, from: data)
+                print("DEBUG: Coins \(coins)")
+                self.coins = coins
+            } catch let error {
+                print("DEBUG: Failed to decode with error: \(error)")
             }
-
         }.resume()
+    }
+
+    func configureTopMovingCoins() {
+        let topMovers = coins.sorted { $0.priceChangePercentage24H ?? 0.0 > $1.priceChangePercentage24H ?? 0.0}
+        self.topMoversCoins = Array(topMovers.prefix(5))
     }
 }
